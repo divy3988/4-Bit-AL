@@ -1,0 +1,217 @@
+* 4Bit Alu
+VDD 19 0 DC 5V
+Va0 20 0 PULSE(0 5 0 0 0 100m 200m)
+Va1 21 0 DC 0V
+Va2 22 0 DC 0V
+Va3 23 0 Dc 0v
+
+Vb0 24 0 PULSE(0 5 0 0 0 50m 100m)
+Vb1 25 0 DC 0V
+Vb2 26 0 DC 0V
+Vb3 27 0 Dc 0v
+
+* Inverter Subcircuit
+.subckt inv 1 2 3
+m1 3 1 0 0 nmod w=100u l=10u
+m2 3 1 2 2 pmod w=100u l=10u
+.ends
+
+.subckt SADD 19 1 2 3 9
+xvac 1 19 4 inv
+xvbc 2 19 5 inv
+xvcc 3 19 6 inv
+
+m1 7 6 0 0 nmod w=100u l=10u
+m2 8 2 7 7 nmod w=100u l=10u
+m3 9 3 8 8 nmod w=100u l=10u
+m4 9 1 10 10 nmod w=100u l=10u
+m5 10 5 11 11 nmod w=100u l=10u
+m6 11 6 0 0 nmod w=100u l=10u
+m7 9 1 12 12 nmod w=100u l=10u
+m8 10 2 13 13 nmod w=100u l=10u
+m9 13 3 0 0 nmod w=100u l=10u
+m10 9 4 14 14 nmod w=100u l=10u
+m11 14 5 15 15 nmod w=100u l=10u
+m12 15 3 0 0 nmod w=100u l=10u
+
+m13 9 4 16 16 pmod w=100u l=10u
+m14 9 2 16 16 pmod w=100u l=10u
+m15 9 6 16 16 pmod w=100u l=10u
+m16 16 1 17 17 pmod w=100u l=10u
+m17 16 5 17 17 pmod w=100u l=10u
+m18 16 6 17 17 pmod w=100u l=10u
+m19 17 1 18 18 pmod w=100u l=10u
+m20 17 2 18 18 pmod w=100u l=10u
+m21 17 3 18 18 pmod w=100u l=10u
+m22 18 4 19 19 pmod w=100u l=10u
+m23 18 5 19 19 pmod w=100u l=10u
+m24 18 3 19 19 pmod w=100u l=10u
+.ends
+
+* Carry Adder (CADD) Subcircuit
+.subckt CADD 15 1 2 3 9
+xvac 1 15 4 inv
+xvbc 2 15 5 inv
+xvcc 3 15 6 inv
+
+m1 7 3 0 0 nmod w=100u l=10u
+m2 8 2 7 7 nmod w=100u l=10u
+m3 9 4 8 8 nmod w=100u l=10u
+m4 9 1 10 10 nmod w=100u l=10u
+m5 10 5 11 11 nmod w=100u l=10u
+m6 11 3 0 0 nmod w=100u l=10u
+m7 9 1 12 12 nmod w=100u l=10u
+m8 12 2 0 0 nmod w=100u l=10u
+
+m13 9 3 13 13 pmod w=100u l=10u
+m14 9 2 13 13 pmod w=100u l=10u
+m15 9 4 13 13 pmod w=100u l=10u
+m16 13 3 14 14 pmod w=100u l=10u
+m17 13 5 14 14 pmod w=100u l=10u
+m18 13 1 14 14 pmod w=100u l=10u
+m19 14 1 15 15 pmod w=100u l=10u
+m20 14 2 15 15 pmod w=100u l=10u
+.ends
+* BORROW Adder (BADD) Subcircuit
+.subckt BADD 14 1 2 3 8
+xvac 1 14 4 inv
+xvbc 2 14 5 inv
+
+m1 6 3 0 0 nmod w=100u l=10u
+m2 7 5 6 6 nmod w=100u l=10u
+m3 8 4 7 7 nmod w=100u l=10u
+m4 8 1 9 9 nmod w=100u l=10u
+m5 9 2 10 10 nmod w=100u l=10u
+m6 10 3 0 0 nmod w=100u l=10u
+m7 8 4 11 11 nmod w=100u l=10u
+m8 11 2 0 0 nmod w=100u l=10u
+
+m13 8 4 12 12 pmod w=100u l=10u
+m14 8 2 12 12 pmod w=100u l=10u
+m15 12 1 13 13 pmod w=100u l=10u
+m16 12 2 13 13 pmod w=100u l=10u
+m17 12 3 13 13 pmod w=100u l=10u
+m18 13 4 14 14 pmod w=100u l=10u
+m19 13 5 14 14 pmod w=100u l=10u
+m20 13 3 14 14 pmod w=100u l=10u
+.ends
+* Full Adder (FADD) with Sum and Carry Outputs 4->sum 5->carry
+.subckt fadd 19 1 2 3 4 5
+xvs 19 1 2 3 7 SADD
+xvc 19 1 2 3 8 CADD
+xvsc 7 19 4 inv
+xvcc 8 19 5 inv
+.ends
+
+* full subs v(1)-v(2) 4->res 5->borrow
+.subckt fsubs 19 1 2 3 4 5
+xvs 19 1 2 3 7 SADD
+xvc 19 1 2 3 8 BADD
+xvsc 7 19 4 inv
+xvcc 8 19 5 inv
+.ends
+
+
+* NAND Gate Subcircuit 8->output 9->vdd
+.subckt nand 9 1 2 3 4 8
+m1 5 1 0 0 nmod w=100u l=10u
+m2 6 2 5 5 nmod w=100u l=10u
+m3 7 3 6 6 nmod w=100u l=10u
+m4 8 4 7 7 nmod w=100u l=10u
+
+m6 8 1 9 9 pmod w=100u l=10u
+m7 8 2 9 9 pmod w=100u l=10u
+m8 8 3 9 9 pmod w=100u l=10u
+m9 8 4 9 9 pmod w=100u l=10u
+.ends
+
+* XOR Gate Subcircuit 2->i/p xor 6->o/p
+.subckt xor 9 1 2 10
+xvac 1 9 3 inv
+xvbc 2 9 4 inv
+
+m1 5 2 0 0 nmod w=100u l=10u
+m2 7 1 0 0 nmod w=100u l=10u
+m3 6 3 5 5 nmod w=100u l=10u
+m4 6 4 7 7 nmod w=100u l=10u
+
+m6 6 4 8 8 pmod w=100u l=10u
+m7 6 1 8 8 pmod w=100u l=10u
+m8 8 3 9 9 pmod w=100u l=10u
+m9 8 2 9 9 pmod w=100u l=10u
+
+xvo 6 9 10 inv
+.ends
+
+*4 i/p xor
+.subckt xor4b 9 1 2 3 4 5
+
+xv1 9 1 2 6 xor
+xv2 9 3 4 7 xor
+
+xv 9 6 7 5 xor
+.ends
+
+* MOSFET Models
+.model nmod nmos level=54 version=4.7
+.model pmod pmos level=54 version=4.7
+
+
+* s0 28 s1 30 s2 32 s3 34 c3 35
+xs0_c0 19 20 24 0 28 29 fadd
+xs1_c1 19 21 25 29 30 31 fadd
+xs2c_2 19 22 26 31 32 33 fadd
+xs3_c3  19 23 27 33 34 35 fadd
+
+*s0 36 s1 38 s2 40 s3 42 c3 43
+xs0_b0 19 20 24 0 36 37 fsubs
+xs1_b1 19 21 25 37 38 39 fsubs
+xs2_b2 19 22 26 39 40 41 fsubs
+xs3_b3  19 23 27 41 42 43 fsubs
+
+*44 nand 45 xor
+xvn 19 20 24 25 26  44 nand
+xv4 19 20 24 25 26 45 xor4b
+
+* mux 5,6 ->select line
+
+.subckt mux 20 1 2 3 4 5 6 7
+xbs1c 5 20 8 inv
+xvs0c 6 20 9 inv
+
+m1 10 9 0 0 nmod
+m2 11 8 10 10 nmod
+m3 12 1 11 11 nmod
+m4 12 2 21 21 nmod
+m5 21 8 22 22 nmod
+m6 22 6 0 0 nmod
+m7 12 3 13 13 nmod
+m8 13 5 14 14 nmod
+m9 14 9 0 0 nmod
+m10 12 4 15 15 nmod
+m11 15 5 16 16 nmod
+m12 16 6 0 0 nmod
+
+m13 17 1 12 12 pmod
+m14 17 8 12 12 pmod
+m15 17 9 12 12 pmod
+m16 18 2 17 17 pmod
+m17 18 8 17 17 pmod
+m18 18 6 17 17 pmod
+m19 19 3 18 18 pmod
+m20 19 5 18 18 pmod
+m21 19 9 18 18 pmod
+m22 20 4 19 19 pmod
+m23 20 5 19 19 pmod
+m24 20 6 19 19 pmod
+
+xvm 12 20 7 inv
+.ends
+
+Vs0 46 0 DC 0v
+Vs1 47 0 DC 0V
+
+xvo 19 35 43 44 45 46 47 48 mux
+
+.tran 0.1m 400m
+.end
