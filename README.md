@@ -1,5 +1,4 @@
-# 4-Bit-ALU
-This project implements a 4-bit ALU for addition, subtraction, NAND, and XOR operations. Designed in Verilog with a SPICE netlist, it enables logic simulation and transistor-level analysis, ideal for studying digital circuit and microprocessor design.
+
 # 4-Bit Arithmetic Logic Unit (ALU)
 
 This project implements a 4-bit Arithmetic Logic Unit (ALU) in Verilog, designed to perform basic arithmetic and logical operations. The project also includes a SPICE netlist for simulation and verification of the ALU's behavior.
