@@ -77,7 +77,7 @@ This project implements a 4-bit Arithmetic Logic Unit (ALU) in Verilog, designed
 ---
 
 ## **Future Improvements**
-- Add more operations, such as AND, OR, and bit-shifting.
+- Add more operations, such as AND, OR,Comparator and bit-shifting.
 - Optimize transistor-level design for power and area efficiency.
 
 ---
